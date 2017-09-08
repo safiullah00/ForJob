@@ -1,0 +1,55 @@
+#include "serial_lib.h"
+#include "main.h"
+
+void Cyclic_Start(const unsigned short PERIOD)
+{
+	RCC_APB1ENR |= 0x00000001;
+	TIM2_CR1 = 0;
+	TIM2_CNT =0;
+	if(PERIOD >1)
+	{
+		TIM2_PSC =  7999;
+		TIM2_ARR =(PERIOD-1);
+	}
+	else
+	{
+		TIM2_PSC =  799;
+		TIM2_ARR =9;			
+	}
+	TIM2_CR1 = 0x0001;
+}
+void Cyclic_Wait(void)
+{
+	while((TIM2_SR & 0x00000001)==0)
+	{
+	}
+	TIM2_SR = 0;
+}
+int main(void)
+{
+	int i =0;
+	Serial_Init(9600);
+	Cyclic_Start(1000);
+	while(1)
+	{
+		i++;
+		if (i%3==0)
+		{
+			
+			Serial_Send_String("Safi",4);
+			Serial_Send_String("\n",1);
+			Serial_Send_String("L1F13BSCS2463",13);
+			Serial_Send_String("\n",1);
+			Serial_Send_String("Foit",4);
+			
+		}
+		Serial_Update();
+		Cyclic_Wait();
+	}
+	return(1);
+}
+
+void SystemInit(void)
+{
+	
+}
